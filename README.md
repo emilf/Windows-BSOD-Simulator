@@ -1,6 +1,7 @@
 # Windows BSOD Simulator
 
 A simple Windows Blue Screen of Death (BSOD) simulator using Python and Pygame.
+Some of the code was provided by ChatGPT (GPT4)
 
 ## Description
 
