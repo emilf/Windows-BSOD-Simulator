@@ -30,4 +30,4 @@ python bsod.py
 To exit the program, press the escape key.
 
 ## License
-This project is in the public domain - see the LICENSE.md file for details
+This project is in the public domain - see the LICENSE file for details
