@@ -1,32 +1,9 @@
 import pygame
 import pyqrcode
-import _thread
 import random
+import ctypes
 from PIL import Image
 from pygame.locals import *
-
-# Initialize Pygame
-pygame.init()
-
-##########################################################################
-#
-#  Function to help locate the UI elements on the screen
-#
-##########################################################################
-def blit_alpha(target, source, location, opacity):
-    x = location[0]
-    y = location[1]
-    temp = pygame.Surface((source.get_width(), source.get_height())).convert()
-    temp.blit(target, (-x, -y))
-    temp.blit(source, (0, 0))
-    temp.set_alpha(opacity)
-    target.blit(temp, location)
-
-screenshot = pygame.image.load('Bsodwindows10.png')
-###########################################################################
-# And within the `print_bsod` function:
-#blit_alpha(screen, screenshot, (0, 0), 128)
-
 
 def get_random_stopcode(filename):
     with open(filename, 'r') as f:
@@ -37,7 +14,7 @@ def get_random_stopcode(filename):
 url = pyqrcode.create('https://www.youtube.com/watch?v=dQw4w9WgXcQ')
 url.png('qrcode_temp.png', scale=4)
 
-# Open the QR code and invert the colors
+# Open the QR code and change the color of the code to blue
 im = Image.open('qrcode_temp.png')
 im = im.convert("RGB")
 datas = im.getdata()
@@ -47,19 +24,22 @@ for item in datas:
     # change all black pixels to blue
     if item[0] in list(range(0, 50)):
         new_image.append((0, 120, 215))
-    # change all white pixels to white
+    # all white pixels stay white
     else:
         new_image.append((255, 255, 255))
 
 im.putdata(new_image)
 im.save("qrcode.png")
 
+# Initialize Pygame
+pygame.init()
 
+# Workaround for high DPI scaling
+ctypes.windll.user32.SetProcessDPIAware()
 
 # Set the dimensions of the window
-infoObject = pygame.display.Info()
 size = (1920, 1080)
-screen = pygame.display.set_mode(size, FULLSCREEN | SCALED)
+screen = pygame.display.set_mode(size, FULLSCREEN)
 
 # Define colors
 blue = (0, 120, 215)
@@ -75,22 +55,16 @@ font_medium_size = 40
 font_small_size = 20
 font_info_size = 16
 
-# Load Segoe UI font
-try:
-    font_search_string = "Segoe UI Semilight, Wingdings"
+# Load Segoe UI font. If it's not found, use Wingdings to highlight the missing font.
+font_search_string = "Segoe UI Semilight, Wingdings"
     
-    font_large = pygame.font.SysFont(font_search_string, font_large_size)
-    font_medium = pygame.font.SysFont(font_search_string, font_medium_size)
-    font_small = pygame.font.SysFont(font_search_string, font_small_size)
-    font_info = pygame.font.SysFont(font_search_string, font_info_size)
-except FileNotFoundError:
-    print("Font not found, using default font")
-    font_large = pygame.font.Font(None, font_large_size)
-    font_medium = pygame.font.Font(None, font_medium_size)
-    font_small = pygame.font.Font(None, font_small_size)
-    font_info = pygame.font.Font(None, font_info_size)
+font_large = pygame.font.SysFont(font_search_string, font_large_size)
+font_medium = pygame.font.SysFont(font_search_string, font_medium_size)
+font_small = pygame.font.SysFont(font_search_string, font_small_size)
+font_info = pygame.font.SysFont(font_search_string, font_info_size)
 
 # Define positions
+# These were found by trial and error
 frown_pos = [190, 105]
 line1_pos = [208, 391]
 line2_pos = [208, 450]
@@ -103,13 +77,11 @@ progress_pos = [208, 600]
 progress_text_pos = [290, 600]
 
 def print_bsod():
+    # Hide the mouse cursor
     pygame.mouse.set_visible(False)
     screen.fill(blue)
-    
-    #### TEST STUFF
-    #blit_alpha(screen, screenshot, (0, 0), 128)
-    #### TEST STUFF END
-    
+
+    # Render text and blit it to the screen
     text = font_large.render(":(", True, white)
     screen.blit(text, frown_pos)
     text = font_medium.render("Your PC ran into a problem and needs to restart. We're", True, white)
@@ -122,13 +94,19 @@ def print_bsod():
     screen.blit(text, line4_pos)
     text = font_info.render("If you call a support person, give them this info:", True, white)
     screen.blit(text, error1_pos)
-    text = font_info.render("Stop code: {}".format(get_random_stopcode('stopcodes.txt')), True, white)
-    screen.blit(text, error2_pos)
-    screen.blit(qrcode, qrcode_pos)
     text = font_medium.render("complete", True, white)
     screen.blit(text, progress_text_pos)
+    
+    # Get a random stop code from the file
+    text = font_info.render("Stop code: {}".format(get_random_stopcode('stopcodes.txt')), True, white)
+    screen.blit(text, error2_pos)
+    
+    # Blit the QR code to the screen
+    screen.blit(qrcode, qrcode_pos)
+
     pygame.display.flip()
 
+    # Update the progress bar every 300ms
     for i in range(1, 101):
         pygame.time.wait(300)
         text = font_medium.render("{}%".format(i), True, white)
@@ -136,19 +114,14 @@ def print_bsod():
         screen.blit(text, progress_pos)
         pygame.display.flip()
 
-        # Take a screenshot at 1%
-        if i == 1:
-            pygame.image.save(screen, 'screenshot.png')
-
         # Check for the quit event inside the loop
         for event in pygame.event.get():
             if event.type == pygame.QUIT or (event.type == KEYDOWN and event.key == K_ESCAPE):
                 return
 
-    #pygame.time.wait(5000)
-
 try:
     print_bsod()
 finally:
+    # Make sure the mouse cursor is visible
     pygame.mouse.set_visible(True)
     pygame.quit()

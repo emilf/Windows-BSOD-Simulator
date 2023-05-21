@@ -10,7 +10,7 @@ This project provides a graphical simulation of the Windows BSOD screen. The pro
 - Full screen BSOD simulation with accurate colors and fonts
 - Progress counter simulating the error information collection process
 - Random stop code message selection from an external text file
-- Display of a QR code similar to the one found in recent Windows BSOD screens
+- Display of a QR code similar to the one found in recent Windows BSOD screens with a configurable URL in the code (defaults to rickrolling)
 
 ## Installation
 
@@ -30,8 +30,5 @@ python bsod.py
 
 To exit the program, press the escape key.
 
-## Known issue
-If the Windows UI is scaled, the BSOD might look like shit. To fix this I found the python executable, opened its properties dialog, selected the compatability tab and there opened the Change high DPI settings dialog. There I checked both checkboxes and selected "Application" in High DPI settings override.
-I've not looked into this issue at all, but if someone does, send me a pull request, open an issue or send a carrier pigeon and I'll patch it.
 ## License
 This project is in the public domain - see the LICENSE file for details
