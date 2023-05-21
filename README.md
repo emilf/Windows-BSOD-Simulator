@@ -30,5 +30,8 @@ python bsod.py
 
 To exit the program, press the escape key.
 
+## Known issue
+If the Windows UI is scaled, the BSOD might look like shit. To fix this I found the python executable, opened its properties dialog, selected the compatability tab and there opened the Change high DPI settings dialog. There I checked both checkboxes and selected "Application" in High DPI settings override.
+I've not looked into this issue at all, but if someone does, send me a pull request, open an issue or send a carrier pigeon and I'll patch it.
 ## License
 This project is in the public domain - see the LICENSE file for details
